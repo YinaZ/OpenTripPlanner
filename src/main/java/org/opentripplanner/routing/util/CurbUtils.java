@@ -1,0 +1,9 @@
+package org.opentripplanner.routing.util;
+
+public class CurbUtils {
+
+    public static String parseKurbTag(String kurb) {
+        // TODO: implement parsing based on what the pre-parsed data looks like
+        return null;
+    }
+}

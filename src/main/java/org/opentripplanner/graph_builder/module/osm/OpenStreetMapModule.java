@@ -47,6 +47,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.util.CurbUtils;
 import org.opentripplanner.routing.vertextype.*;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -68,6 +69,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     private Set<Object> _uniques = new HashSet<Object>();
 
     private HashMap<Vertex, Double> elevationData = new HashMap<Vertex, Double>();
+
+    private HashMap<Vertex, String> curbData = new HashMap<>();
 
     public boolean skipVisibility = false;
 
@@ -94,6 +97,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * Ignore wheelchair accessibility information.
      */
     public boolean ignoreWheelchairAccessibility = false;
+
+    /**
+     * Use curb data from OSM into OTP to integrate into routing cost function
+     */
+    public boolean useCurbData = true;
 
     /**
      * Allows for alternate PlainStreetEdge implementations; this is intended for users who want to provide more info in PSE than OTP normally keeps
@@ -657,6 +665,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                 elevationData.put(startEndpoint, elevation);
                             }
                         }
+                        if (useCurbData) {
+                            String curb = segmentStartOSMNode.getTag("kerb");
+                            if (curb != null) {
+                                String curbParsed = CurbUtils.parseKurbTag(curb);
+                                curbData.put(startEndpoint, curbParsed);
+                            }
+                        }
                     } else { // subsequent iterations
                         startEndpoint = endEndpoint;
                     }
@@ -669,6 +684,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             elevationData.put(endEndpoint, elevation);
                         }
                     }
+
+                    if (useCurbData) {
+                        String curb = osmEndNode.getTag("kerb");
+                        if (curb != null) {
+                            String curbParsed = CurbUtils.parseKurbTag(curb);
+                            curbData.put(startEndpoint, curbParsed);
+                        }
+                    }
+
                     P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
                             way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
 
