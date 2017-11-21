@@ -667,10 +667,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                         }
                         if (useCurbData) {
                             String curb = segmentStartOSMNode.getTag("kerb");
+                            String curbParsed = null;
                             if (curb != null) {
-                                String curbParsed = CurbUtils.parseKurbTag(curb);
-                                curbData.put(startEndpoint, curbParsed);
+                                curbParsed = CurbUtils.parseKurbTag(curb);
                             }
+                            curbData.put(startEndpoint, curbParsed);
                         }
                     } else { // subsequent iterations
                         startEndpoint = endEndpoint;
@@ -687,10 +688,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
                     if (useCurbData) {
                         String curb = osmEndNode.getTag("kerb");
+                        String curbParsed = null;
                         if (curb != null) {
-                            String curbParsed = CurbUtils.parseKurbTag(curb);
-                            curbData.put(startEndpoint, curbParsed);
+                            curbParsed = CurbUtils.parseKurbTag(curb);
                         }
+                        curbData.put(endEndpoint, curbParsed);
                     }
 
                     P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
