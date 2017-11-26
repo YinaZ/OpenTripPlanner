@@ -23,6 +23,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.extra_graph.Curb;
 import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
@@ -272,6 +273,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             // generate elevation profiles
             extra.put(ElevationPoint.class, elevationData);
+            extra.put(Curb.class, curbData);
 
             applyBikeSafetyFactor(graph);
         } // END buildGraph()
