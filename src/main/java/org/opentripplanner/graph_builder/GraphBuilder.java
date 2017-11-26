@@ -153,9 +153,10 @@ public class GraphBuilder implements Runnable {
         }
         
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
-        for (GraphBuilderModule load : _graphBuilderModules)
+        for (GraphBuilderModule load : _graphBuilderModules) {
             load.buildGraph(graph, extra);
-
+            System.out.println(load);
+        }
         graph.summarizeBuilderAnnotations();
         if (serializeGraph) {
             try {

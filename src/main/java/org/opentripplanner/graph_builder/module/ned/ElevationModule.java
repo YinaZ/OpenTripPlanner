@@ -132,6 +132,7 @@ public class ElevationModule implements GraphBuilderModule {
 
         @SuppressWarnings("unchecked")
         HashMap<Vertex, Double> extraElevation = (HashMap<Vertex, Double>) extra.get(ElevationPoint.class);
+        //TODO get like this
         assignMissingElevations(graph, edgesWithElevation, extraElevation);
     }
 

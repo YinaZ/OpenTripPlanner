@@ -99,11 +99,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public boolean ignoreWheelchairAccessibility = false;
 
     /**
-     * Use curb data from OSM into OTP to integrate into routing cost function
-     */
-    public boolean useCurbData = true;
-
-    /**
      * Allows for alternate PlainStreetEdge implementations; this is intended for users who want to provide more info in PSE than OTP normally keeps
      * around.
      */
@@ -665,14 +660,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                 elevationData.put(startEndpoint, elevation);
                             }
                         }
-                        if (useCurbData) {
-                            String curb = segmentStartOSMNode.getTag("kerb");
-                            String curbParsed = null;
-                            if (curb != null) {
-                                curbParsed = CurbUtils.parseKurbTag(curb);
-                            }
-                            curbData.put(startEndpoint, curbParsed);
+
+                        String kerb = segmentStartOSMNode.getTag("kerb");
+                        String curbParsed = null;
+                        if (kerb != null) {
+                            curbParsed = CurbUtils.parseKerbTag(kerb);
                         }
+                        curbData.put(startEndpoint, curbParsed);
                     } else { // subsequent iterations
                         startEndpoint = endEndpoint;
                     }
@@ -686,14 +680,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                         }
                     }
 
-                    if (useCurbData) {
-                        String curb = osmEndNode.getTag("kerb");
-                        String curbParsed = null;
-                        if (curb != null) {
-                            curbParsed = CurbUtils.parseKurbTag(curb);
-                        }
-                        curbData.put(endEndpoint, curbParsed);
+                    String kerb = osmEndNode.getTag("kerb");
+                    String curbParsed = null;
+                    if (kerb != null) {
+                        curbParsed = CurbUtils.parseKerbTag(kerb);
                     }
+                    curbData.put(endEndpoint, curbParsed);
 
                     P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
                             way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
