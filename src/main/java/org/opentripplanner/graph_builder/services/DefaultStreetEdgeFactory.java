@@ -13,11 +13,7 @@
 
 package org.opentripplanner.graph_builder.services;
 
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -26,6 +22,7 @@ import org.opentripplanner.util.I18NString;
 public class DefaultStreetEdgeFactory implements StreetEdgeFactory {
 
     public boolean useElevationData = false;
+    public boolean useCurbData = true;
 
     @Override
     public StreetEdge createEdge(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
@@ -34,6 +31,9 @@ public class DefaultStreetEdgeFactory implements StreetEdgeFactory {
         StreetEdge pse;
         if (useElevationData) {
             pse = new StreetWithElevationEdge(startEndpoint, endEndpoint, geometry, name, length,
+                    permissions, back);
+        } else if (useCurbData) {
+            pse = new StreetWithCurbEdge(startEndpoint, endEndpoint, geometry, name, length,
                     permissions, back);
         } else {
             pse = new StreetEdge(startEndpoint, endEndpoint, geometry, name, length, permissions,
