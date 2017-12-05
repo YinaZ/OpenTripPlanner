@@ -89,7 +89,12 @@ public class StreetWithCurbEdge extends StreetEdge {
         if (curbData2.equals("flush_[road_hump]")) {
             slopeWorkFactor += FACTOR_ROAD_HUMP;
         }
-
+        if (curbData1.equals("rolled")) {
+            curbData1 = "raised";
+        }
+        if (curbData2.equals("rolled")) {
+            curbData1 = "raised";
+        }
         return true;
     }
 

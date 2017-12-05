@@ -46,7 +46,7 @@ public class CurbModule implements GraphBuilderModule {
         int nTotal = 0;
         int nProcessed = 0;
         for (Vertex gv : graph.getVertices()) {
-            LOG.info(extraElevation.toString());
+//            LOG.info(extraElevation.toString());
             if (extraElevation.containsKey(gv)) {
                 // TODO add curb data to the vertex, also only 7000 vertices in graph... needs all
                 nTotal++;
