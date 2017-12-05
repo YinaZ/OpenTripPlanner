@@ -15,6 +15,9 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.extra_graph.Curb;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.routing.edgetype.StreetWithCurbEdge;
+import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
@@ -46,15 +49,23 @@ public class CurbModule implements GraphBuilderModule {
         int nTotal = 0;
         int nProcessed = 0;
         for (Vertex gv : graph.getVertices()) {
-            LOG.info(extraElevation.toString());
-            if (extraElevation.containsKey(gv)) {
-                // TODO add curb data to the vertex, also only 7000 vertices in graph... needs all
-                nTotal++;
+            for (Edge ee : gv.getOutgoing()) {
+                if (ee instanceof StreetWithCurbEdge) {
+                    nProcessed++;
+                    StreetWithCurbEdge edgeWithCurb = (StreetWithCurbEdge) ee;
+                    processEdge(graph, edgeWithCurb, extraElevation);
+                }
             }
         }
 
         LOG.info("Processed " + nProcessed + " vertices out of " + nTotal + " total vertices...");
         System.exit(1);
+    }
+
+    private void processEdge(Graph graph, StreetWithCurbEdge edgeWithCurb, HashMap<Vertex, String> extra) {
+        Vertex v1 = edgeWithCurb.getFromVertex();
+        Vertex v2 = edgeWithCurb.getToVertex();
+        edgeWithCurb.setCurbProfile(v1, extra.get(v1), v2, extra.get(v2));
     }
 
     @Override
