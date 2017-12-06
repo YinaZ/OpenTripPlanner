@@ -457,6 +457,49 @@ otp.widgets.tripoptions.WheelChairSelector =
     }
 });
 
+//** CurbSelector **//
+
+otp.widgets.tripoptions.CurbSelector =
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+
+    id           :  null,
+    //TRANSLATORS: label for checkbox
+    label        : _tr("Curb ramp required:"),
+
+    initialize : function(tripWidget) {
+
+        otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+
+        this.id = tripWidget.id;
+
+
+        ich['otp-tripOptions-curb']({
+            widgetId : this.id,
+            label : this.label,
+        }).appendTo(this.$());
+
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+
+        $("#"+this.id+"-curb-input").change(function() {
+            this_.tripWidget.module.curb = this.checked;
+        });
+    },
+
+    restorePlan : function(data) {
+        if(data.queryParams.curb) {
+            $("#"+this.id+"-curb-input").prop("checked", data.queryParams.curb);
+        }
+    },
+
+    isApplicableForMode : function(mode) {
+        //Curb mode is shown on transit and walk trips that
+        //doesn't include a bicycle
+        return (otp.util.Itin.includesTransit(mode)  || mode == "WALK") && !otp.util.Itin.includesBicycle(mode);
+    }
+});
 
 //** ModeSelector **//
 
