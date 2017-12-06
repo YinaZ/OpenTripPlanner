@@ -49,6 +49,7 @@ public class CurbModule implements GraphBuilderModule {
         int nTotal = 0;
         int nProcessed = 0;
         for (Vertex gv : graph.getVertices()) {
+            nTotal++;
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof StreetWithCurbEdge) {
                     nProcessed++;
@@ -59,7 +60,6 @@ public class CurbModule implements GraphBuilderModule {
         }
 
         LOG.info("Processed " + nProcessed + " vertices out of " + nTotal + " total vertices...");
-        System.exit(1);
     }
 
     private void processEdge(Graph graph, StreetWithCurbEdge edgeWithCurb, HashMap<Vertex, String> extra) {

@@ -238,6 +238,7 @@ public class GraphBuilder implements Runnable {
             OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProviders);
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
             streetEdgeFactory.useElevationData = builderParams.fetchElevationUS || (demFile != null);
+            streetEdgeFactory.useCurbData = true; // check other place
             osmModule.edgeFactory = streetEdgeFactory;
             osmModule.customNamer = builderParams.customNamer;
             osmModule.setDefaultWayPropertySetSource(builderParams.wayPropertySet);

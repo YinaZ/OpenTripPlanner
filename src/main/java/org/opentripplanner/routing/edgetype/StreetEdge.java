@@ -369,6 +369,12 @@ public class StreetEdge extends Edge implements Cloneable {
             }
             weight = time;
             if (traverseMode.equals(TraverseMode.WALK)) {
+                if (true /* && userAvoidCurbsStrong()*/) {
+                    weight += 3 * getSlopeWorkCostEffectiveLength(); // if constructed as curbedge, should call subclass method
+                } else if (true /* && userAvoidCurbsWeak */) {
+                    weight += 2 * getSlopeWorkCostEffectiveLength(); // if constructed as curbedge, should call subclass method
+                }
+
                 // take slopes into account when walking
                 // FIXME: this causes steep stairs to be avoided. see #1297.
                 double costs = ElevationUtils.getWalkCostsForSlope(getDistance(), getMaxSlope());
