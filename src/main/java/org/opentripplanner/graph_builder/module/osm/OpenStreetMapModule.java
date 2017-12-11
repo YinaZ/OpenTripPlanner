@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import com.google.common.collect.Iterables;
+import com.sun.xml.internal.bind.v2.TODO;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -662,11 +663,24 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                 elevationData.put(startEndpoint, elevation);
                             }
                         }
-
+                        String barrier = segmentStartOSMNode.getTag("barrier");
                         String kerb = segmentStartOSMNode.getTag("kerb");
                         String curbParsed = null;
                         if (kerb != null) {
                             curbParsed = CurbUtils.parseKerbTag(kerb);
+                        }else if(barrier != null && barrier.equals("kerb")){
+                            // saves to one of the categories of kerbs based on kerb height
+                            String kerbHeight = segmentStartOSMNode.getTag("height");
+                            if(kerbHeight != null) {
+                                //values based upon kerb tagging
+                                if (Integer.parseInt(kerbHeight) < 1) {
+                                    curbParsed = "flush";
+                                } else if (Integer.parseInt(kerbHeight) <= 3) {
+                                    curbParsed = "lowered";
+                                } else {
+                                    curbParsed = "yes";
+                                }
+                            }
                         }
                         curbData.put(startEndpoint, curbParsed);
                     } else { // subsequent iterations
@@ -674,6 +688,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     }
 
                     endEndpoint = getVertexForOsmNode(osmEndNode, way);
+
                     String ele = osmEndNode.getTag("ele");
                     if (ele != null) {
                         Double elevation = ElevationUtils.parseEleTag(ele);
@@ -683,9 +698,21 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     }
 
                     String kerb = osmEndNode.getTag("kerb");
+                    String barrier = osmEndNode.getTag("barrier");
                     String curbParsed = null;
                     if (kerb != null) {
                         curbParsed = CurbUtils.parseKerbTag(kerb);
+                    }else if (barrier != null&&barrier.equals("kerb")){
+                        String kerbHeight = osmEndNode.getTag("height");
+                        if(kerbHeight != null){
+                            if(Integer.parseInt(kerbHeight) < 1){
+                                curbParsed = "flush";
+                            }else if(Integer.parseInt(kerbHeight) <= 3){
+                                curbParsed = "lowered";
+                            }else{
+                                curbParsed = "yes";
+                            }
+                        }
                     }
                     curbData.put(endEndpoint, curbParsed);
 
