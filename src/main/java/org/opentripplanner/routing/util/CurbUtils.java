@@ -18,8 +18,9 @@ import org.slf4j.LoggerFactory;
 
 public class CurbUtils {
     private static final Logger LOG = LoggerFactory.getLogger(CurbUtils.class);
+
     public static String parseKerbTag(String kerb) {
-        LOG.info(kerb);
+        //LOG.info(kerb);
         if(kerb.contains("_")){
             return kerb.split("_")[0];
         }
