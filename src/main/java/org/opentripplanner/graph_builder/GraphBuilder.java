@@ -27,6 +27,7 @@ import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
+import org.opentripplanner.graph_builder.module.osm.CurbModule;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
@@ -153,9 +154,10 @@ public class GraphBuilder implements Runnable {
         }
         
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
-        for (GraphBuilderModule load : _graphBuilderModules)
+        for (GraphBuilderModule load : _graphBuilderModules) {
             load.buildGraph(graph, extra);
-
+            System.out.println(load);
+        }
         graph.summarizeBuilderAnnotations();
         if (serializeGraph) {
             try {
@@ -236,6 +238,7 @@ public class GraphBuilder implements Runnable {
             OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProviders);
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
             streetEdgeFactory.useElevationData = builderParams.fetchElevationUS || (demFile != null);
+            streetEdgeFactory.useCurbData = true; // check other place
             osmModule.edgeFactory = streetEdgeFactory;
             osmModule.customNamer = builderParams.customNamer;
             osmModule.setDefaultWayPropertySetSource(builderParams.wayPropertySet);
@@ -312,6 +315,11 @@ public class GraphBuilder implements Runnable {
                 graphBuilder.addModule(new DirectTransferGenerator(builderParams.maxTransferDistance));
             }
         }
+
+        if ( hasOSM) {
+            graphBuilder.addModule(new CurbModule());
+        }
+
         graphBuilder.addModule(new EmbedConfig(builderConfig, routerConfig));
         if (builderParams.htmlAnnotations) {
             graphBuilder.addModule(new AnnotationsToHTML(params.build, builderParams.maxHtmlAnnotationsPerFile));

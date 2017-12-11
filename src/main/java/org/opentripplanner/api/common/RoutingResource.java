@@ -90,6 +90,10 @@ public abstract class RoutingResource {
     @QueryParam("wheelchair")
     protected Boolean wheelchair;
 
+    /** Whether the trip must have curbs. */
+    @QueryParam("curb")
+    protected Boolean curb;
+
     /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
     @QueryParam("maxWalkDistance")
     protected Double maxWalkDistance;
@@ -422,6 +426,10 @@ public abstract class RoutingResource {
 
         if (wheelchair != null)
             request.setWheelchairAccessible(wheelchair);
+
+        if (curb != null) {
+            request.setCurbRequired(curb);
+        }
 
         if (numItineraries != null)
             request.setNumItineraries(numItineraries);

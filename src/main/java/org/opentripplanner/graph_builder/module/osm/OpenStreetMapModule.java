@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import com.google.common.collect.Iterables;
+import com.sun.xml.internal.bind.v2.TODO;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -23,6 +24,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.extra_graph.Curb;
 import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
@@ -47,6 +49,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.util.CurbUtils;
 import org.opentripplanner.routing.vertextype.*;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -68,6 +71,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     private Set<Object> _uniques = new HashSet<Object>();
 
     private HashMap<Vertex, Double> elevationData = new HashMap<Vertex, Double>();
+
+    private HashMap<Vertex, String> curbData = new HashMap<>();
 
     public boolean skipVisibility = false;
 
@@ -269,6 +274,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             // generate elevation profiles
             extra.put(ElevationPoint.class, elevationData);
+            extra.put(Curb.class, curbData);
 
             applyBikeSafetyFactor(graph);
         } // END buildGraph()
@@ -657,11 +663,32 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                 elevationData.put(startEndpoint, elevation);
                             }
                         }
+                        String barrier = segmentStartOSMNode.getTag("barrier");
+                        String kerb = segmentStartOSMNode.getTag("kerb");
+                        String curbParsed = null;
+                        if (kerb != null) {
+                            curbParsed = CurbUtils.parseKerbTag(kerb);
+                        }else if(barrier != null && barrier.equals("kerb")){
+                            // saves to one of the categories of kerbs based on kerb height
+                            String kerbHeight = segmentStartOSMNode.getTag("height");
+                            if(kerbHeight != null) {
+                                //values based upon kerb tagging
+                                if (Integer.parseInt(kerbHeight) < 1) {
+                                    curbParsed = "flush";
+                                } else if (Integer.parseInt(kerbHeight) <= 3) {
+                                    curbParsed = "lowered";
+                                } else {
+                                    curbParsed = "yes";
+                                }
+                            }
+                        }
+                        curbData.put(startEndpoint, curbParsed);
                     } else { // subsequent iterations
                         startEndpoint = endEndpoint;
                     }
 
                     endEndpoint = getVertexForOsmNode(osmEndNode, way);
+
                     String ele = osmEndNode.getTag("ele");
                     if (ele != null) {
                         Double elevation = ElevationUtils.parseEleTag(ele);
@@ -669,6 +696,26 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             elevationData.put(endEndpoint, elevation);
                         }
                     }
+
+                    String kerb = osmEndNode.getTag("kerb");
+                    String barrier = osmEndNode.getTag("barrier");
+                    String curbParsed = null;
+                    if (kerb != null) {
+                        curbParsed = CurbUtils.parseKerbTag(kerb);
+                    }else if (barrier != null&&barrier.equals("kerb")){
+                        String kerbHeight = osmEndNode.getTag("height");
+                        if(kerbHeight != null){
+                            if(Integer.parseInt(kerbHeight) < 1){
+                                curbParsed = "flush";
+                            }else if(Integer.parseInt(kerbHeight) <= 3){
+                                curbParsed = "lowered";
+                            }else{
+                                curbParsed = "yes";
+                            }
+                        }
+                    }
+                    curbData.put(endEndpoint, curbParsed);
+
                     P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
                             way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
 
