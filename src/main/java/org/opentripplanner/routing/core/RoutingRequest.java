@@ -130,6 +130,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether the trip must be wheelchair accessible. */
     public boolean wheelchairAccessible = false;
 
+    /** Whether the trip must have curbs. */
+    public boolean curbRequired = false;
+
     /** The maximum number of itineraries to return. */
     public int numItineraries = 3;
 
@@ -554,6 +557,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
+    public void setCurbRequired(boolean curbRequired) {
+        this.curbRequired = curbRequired;
+    }
+
 
 
     /**
@@ -917,6 +924,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && maxTransfers == other.maxTransfers
                 && modes.equals(other.modes)
                 && wheelchairAccessible == other.wheelchairAccessible
+                && curbRequired == other.curbRequired
                 && optimize.equals(other.optimize)
                 && maxWalkDistance == other.maxWalkDistance
                 && maxTransferWalkDistance == other.maxTransferWalkDistance
